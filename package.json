@@ -1,15 +1,15 @@
 {
 	"name": "oca-proxy",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "OpenAI-compatible proxy for Oracle Code Assist (OCA)",
 	"main": "dist/index.js",
-  "bin": {
-    "oca-proxy": "bin/oca-proxy.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/banzalik/oca-proxy.git"
-  },
+	"bin": {
+		"oca-proxy": "bin/oca-proxy.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/banzalik/oca-proxy.git"
+	},
 	"scripts": {
 		"build": "esbuild src/index.ts --bundle --platform=node --target=es2022 --outfile=bin/oca-proxy.js --format=cjs --banner:js='#!/usr/bin/env node' --packages=external --minify --legal-comments=none && chmod +x bin/oca-proxy.js",
 		"start": "bin/oca-proxy.js",
