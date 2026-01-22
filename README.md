@@ -119,9 +119,7 @@ Custom mappings can be configured in `~/.config/oca/oca-proxy.config.json`:
 }
 ```
 
-## Integration Examples
 
-See CONFIG.md for editor and tool setup examples: [CONFIG.md](./CONFIG.md)
 
 ## Files
 

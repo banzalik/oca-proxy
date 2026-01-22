@@ -161,7 +161,7 @@ export function registerDashboard(
 
            <div id="tab-usage" class="tab-panel" style="display:none">
             <h2>Usage</h2>
-            <p style="margin: 8px 0;"><a href="https://github.com/banzalik/oca-proxy/blob/master/CONFIG.md" target="_blank" rel="noopener noreferrer">Configuration examples (CONFIG.md)</a></p>
+
             <div class="endpoint">
               <strong>With Claude Code (Anthropic format):</strong><br>
               <code>ANTHROPIC_API_KEY=dummy ANTHROPIC_BASE_URL=http://localhost:${PROXY_PORT} claude</code>
