@@ -1,19 +1,22 @@
-import type express from "express"
-import type { Request, Response } from "express"
-import type { TokenManager } from "./auth"
-import { OCA_CONFIG, PROXY_PORT, TOKEN_FILE } from "./config"
+import type express from "express";
+import type { Request, Response } from "express";
+import type { TokenManager } from "./auth";
+import { OCA_CONFIG, PROXY_PORT, TOKEN_FILE } from "./config";
 
-export function registerDashboard(app: express.Express, tokenMgr: TokenManager) {
+export function registerDashboard(
+	app: express.Express,
+	tokenMgr: TokenManager,
+) {
 	/**
 	 * Root endpoint - Dashboard
 	 */
 	app.get("/", async (_req: Request, res: Response) => {
-		const authenticated = tokenMgr.isAuthenticated()
-		const statusColor = authenticated ? "green" : "orange"
-		const statusText = authenticated ? "Authenticated" : "Not Authenticated"
+		const authenticated = tokenMgr.isAuthenticated();
+		const statusColor = authenticated ? "green" : "orange";
+		const statusText = authenticated ? "Authenticated" : "Not Authenticated";
 		const actionHtml = authenticated
 			? '<a href="/logout" style="color: red;">Logout</a>'
-			: '<a href="/login">Login with Oracle Code Assist</a>'
+			: '<a href="/login">Login with Oracle Code Assist</a>';
 
 		res.send(`
       <html>
@@ -158,6 +161,7 @@ export function registerDashboard(app: express.Express, tokenMgr: TokenManager) 
 
            <div id="tab-usage" class="tab-panel" style="display:none">
             <h2>Usage</h2>
+            <p style="margin: 8px 0;"><a href="https://github.com/banzalik/oca-proxy/blob/master/CONFIG.md" target="_blank" rel="noopener noreferrer">Configuration examples (CONFIG.md)</a></p>
             <div class="endpoint">
               <strong>With Claude Code (Anthropic format):</strong><br>
               <code>ANTHROPIC_API_KEY=dummy ANTHROPIC_BASE_URL=http://localhost:${PROXY_PORT} claude</code>
@@ -540,6 +544,6 @@ export function registerDashboard(app: express.Express, tokenMgr: TokenManager) 
           </script>
         </body>
       </html>
-    `)
-	})
+    `);
+	});
 }

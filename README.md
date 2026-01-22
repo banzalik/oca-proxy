@@ -7,23 +7,24 @@ This proxy handles OCI authentication via web-based OAuth flow and exposes stand
 ## Quick Start
 
 ```bash
+# Run without installing (recommended)
+npx oca-proxy
+```
+
+Or install globally from npm and run:
+
+```bash
+npm install -g oca-proxy
+oca-proxy
+```
+
+### From Source
+
+```bash
 cd oca-proxy
 npm install
 npm run build
 npx ./bin/oca-proxy.js
-```
-
-Or install globally and run from anywhere:
-
-```bash
-npm install -g .
-oca-proxy
-```
-
-You can also use npx after local or global install:
-
-```bash
-npx oca-proxy
 ```
 
 On first run, the browser will automatically open for OAuth login. After authentication, the proxy is ready to use.
@@ -36,7 +37,7 @@ The proxy uses web-based OAuth with PKCE on whitelisted ports (8669, 8668, 8667)
 - **Logout:** Visit `http://localhost:8669/logout`
 - **Status:** Visit `http://localhost:8669/health`
 
-Tokens are stored in `~/.oca/refresh_token.json` (same location as Python proxy).
+Tokens are stored in `~/.oca/refresh_token.json`.
 
 ## Usage with OpenAI SDK
 
@@ -107,7 +108,7 @@ curl http://localhost:8669/v1/chat/completions \
 
 Models not starting with `oca/` are automatically mapped to `oca/gpt-4.1` by default.
 
-Custom mappings can be configured in `~/.config/oca/oca-proxy.config.json` (old path `~/.oca/oca-proxy-config.json` still read):
+Custom mappings can be configured in `~/.config/oca/oca-proxy.config.json`:
 
 ```json
 {
@@ -120,69 +121,7 @@ Custom mappings can be configured in `~/.config/oca/oca-proxy.config.json` (old 
 
 ## Integration Examples
 
-### Claude Code
-
-Use the Anthropic endpoint with Claude Code:
-
-```bash
-export ANTHROPIC_API_KEY=dummy
-export ANTHROPIC_BASE_URL=http://localhost:8669
-claude
-```
-
-Or use environment variables in one line:
-
-```bash
-ANTHROPIC_API_KEY=dummy ANTHROPIC_BASE_URL=http://localhost:8669 claude
-```
-
-### OpenCode
-
-Create `opencode.json` in your project root:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "oca": {
-      "api": "openai",
-      "name": "Oracle Code Assist",
-      "options": {
-        "baseURL": "http://localhost:8669/v1",
-        "apiKey": "dummy"
-      },
-      "models": {
-        "gpt-4.1": {
-          "id": "oca/gpt-4.1",
-          "name": "OCA GPT 4.1"
-        }
-      }
-    }
-  },
-  "model": "oca/gpt-4.1"
-}
-```
-
-### Aider
-
-```bash
-aider --openai-api-key dummy --openai-api-base http://localhost:8669/v1
-```
-
-### Continue (VS Code)
-
-```json
-{
-  "models": [
-    {
-      "provider": "openai",
-      "model": "oca/gpt-4.1",
-      "apiKey": "dummy",
-      "apiBase": "http://localhost:8669/v1"
-    }
-  ]
-}
-```
+See CONFIG.md for editor and tool setup examples: [CONFIG.md](./CONFIG.md)
 
 ## Files
 
@@ -202,7 +141,7 @@ oca-proxy/
 
 ## Running with PM2
 
-PM2 is a production process manager for Node.js applications. To run the OCA Proxy with PM2:
+PM2 is a production process manager for Node.js applications. You can run the OCA Proxy via the global binary or npx.
 
 1. Install PM2 globally:
 
@@ -210,19 +149,19 @@ PM2 is a production process manager for Node.js applications. To run the OCA Pro
    npm install -g pm2
    ```
 
-2. Build the project:
+2. Start the proxy (choose one):
 
-   ```bash
-   npm run build
-   ```
+   - Global install:
+     ```bash
+     pm2 start oca-proxy --name oca-proxy
+     ```
 
-3. Start the proxy:
+   - Using npx (no global install):
+     ```bash
+     pm2 start "npx oca-proxy" --name oca-proxy
+     ```
 
-   ```bash
-   pm2 start dist/oca-proxy.js --name oca-proxy
-   ```
-
-4. Monitor and manage:
+3. Monitor and manage:
    - View status: `pm2 status`
    - View logs: `pm2 logs oca-proxy`
    - Restart: `pm2 restart oca-proxy`
@@ -236,7 +175,11 @@ module.exports = {
   apps: [
     {
       name: 'oca-proxy',
-      script: 'bin/oca-proxy.js',
+      // If installed globally:
+      script: 'oca-proxy',
+      // Or, if you prefer npx, use:
+      // script: 'npx',
+      // args: 'oca-proxy',
       env: {
         NODE_ENV: 'production',
         PORT: 8669,
@@ -248,11 +191,4 @@ module.exports = {
 
 Then start with `pm2 start ecosystem.config.js`.
 
-## Comparison with Python Proxy
 
-This TypeScript proxy is functionally equivalent to the Python proxy at `~/project/ccr-oca/oca-proxy/`. Both:
-
-- Use the same OAuth client (internal mode)
-- Store tokens in the same location (`~/.oca/refresh_token.json`)
-- Support the same whitelisted ports (8669, 8668, 8667)
-- Provide OpenAI-compatible endpoints

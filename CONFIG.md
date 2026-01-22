@@ -6,6 +6,8 @@
 - [Claude Code Router](#claude-code-router)
 - [OpenCode](#opencode)
 - [Claude Code](#claude-code)
+- [Aider](#aider)
+- [Continue (VS Code)](#continue-vs-code)
 
 ## Zed
 
@@ -243,4 +245,29 @@ Claude Code (https://code.claude.com/docs/en/overview) is a command-line tool fo
 
 ```bash
 ANTHROPIC_API_KEY=dummy ANTHROPIC_BASE_URL=http://localhost:8669 claude
+```
+
+## Aider
+
+Aider (https://aider.chat/) quick setup:
+
+```bash
+aider --openai-api-key dummy --openai-api-base http://localhost:8669/v1
+```
+
+## Continue (VS Code)
+
+Continue (https://github.com/continuedev/continue) model configuration:
+
+```json
+{
+  "models": [
+    {
+      "provider": "openai",
+      "model": "oca/gpt-4.1",
+      "apiKey": "dummy",
+      "apiBase": "http://localhost:8669/v1"
+    }
+  ]
+}
 ```
