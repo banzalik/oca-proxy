@@ -1,48 +1,48 @@
 {
-	"name": "oca-proxy",
-	"version": "1.0.1",
-	"description": "OpenAI-compatible proxy for Oracle Code Assist (OCA)",
-	"main": "dist/index.js",
-	"bin": {
-		"oca-proxy": "bin/oca-proxy.js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/banzalik/oca-proxy.git"
-	},
-	"scripts": {
-		"build": "esbuild src/index.ts --bundle --platform=node --target=es2022 --outfile=bin/oca-proxy.js --format=cjs --banner:js='#!/usr/bin/env node' --packages=external --minify --legal-comments=none && chmod +x bin/oca-proxy.js",
-		"start": "bin/oca-proxy.js",
-		"dev": "tsx src/index.ts",
-		"format": "biome format --write .",
-		"lint": "biome lint .",
-		"check": "biome check --write .",
-		"typecheck": "tsc -p tsconfig.json --noEmit",
-		"prepublishOnly": "npm run build"
-	},
-	"dependencies": {
-		"axios": "1.13.2",
-		"express": "5.2.1",
-		"jwt-decode": "4.0.0",
-		"open": "11.0.0",
-		"uuid": "13.0.0"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "2.3.11",
-		"@types/express": "5.0.6",
-		"@types/node": "25.0.9",
-		"@types/uuid": "11.0.0",
-		"esbuild": "0.27.2",
-		"tsx": "4.21.0",
-		"typescript": "5.9.3"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"files": [
-		"bin/**",
-		"dist/**",
-		"README.md",
-		"LICENSE"
-	]
+  "name": "oca-proxy",
+  "version": "1.0.1",
+  "description": "OpenAI-compatible proxy for Oracle Code Assist (OCA)",
+  "main": "dist/index.js",
+  "bin": {
+    "oca-proxy": "bin/oca-proxy.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/banzalik/oca-proxy.git"
+  },
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=es2022 --outfile=bin/oca-proxy.js --format=cjs --banner:js='#!/usr/bin/env node' --minify --legal-comments=none && chmod +x bin/oca-proxy.js",
+    "start": "bin/oca-proxy.js",
+    "dev": "tsx src/index.ts",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "check": "biome check --write .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "axios": "1.13.2",
+    "express": "5.2.1",
+    "jwt-decode": "4.0.0",
+    "open": "11.0.0",
+    "uuid": "13.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.11",
+    "@types/express": "5.0.6",
+    "@types/node": "25.0.10",
+    "@types/uuid": "11.0.0",
+    "esbuild": "0.27.2",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "bin/**",
+    "dist/**",
+    "README.md",
+    "LICENSE"
+  ]
 }
