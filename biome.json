@@ -3,5 +3,20 @@
 	"files": {
 		"includes": ["**/*", "!!**/bin", "!!**/dist", "!!**/node_modules"],
 		"maxSize": 6000000
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["package.json"],
+			"formatter": {
+				"indentStyle": "space",
+				"indentWidth": 2
+			},
+			"json": {
+				"formatter": {
+					"indentStyle": "space",
+					"indentWidth": 2
+				}
+			}
+		}
+	]
 }

@@ -1107,8 +1107,17 @@ const _server = app.listen(PROXY_PORT, async () => {
 		try {
 			const open = (await import("open")).default;
 			setTimeout(() => {
-				open(`http://localhost:${PROXY_PORT}/login`);
-				log.info("Browser opened for authentication");
+				const url = `http://localhost:${PROXY_PORT}/login`;
+				Promise.resolve(open(url))
+					.then(() => {
+						log.info("Browser opened for authentication");
+					})
+					.catch((err: unknown) => {
+						const msg =
+							(err as { message?: string }).message ?? "unknown error";
+						log.warn(`Failed to auto-open browser: ${msg}`);
+						log.info(`Please open this URL manually: ${url}`);
+					});
 			}, 1500);
 		} catch {
 			// open module not available
