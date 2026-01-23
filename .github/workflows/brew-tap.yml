@@ -1,0 +1,42 @@
+name: Update Homebrew Tap
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  bump-formula:
+    name: Bump Formula in Tap
+    runs-on: ubuntu-latest
+    steps:
+      # This action updates the version and sha256 checksums in your tap's Formula/oca-proxy.rb
+      # Requirements:
+      # 1) Create a tap repo named "<your-user-or-org>/homebrew-tap"
+      # 2) Ensure the tap has "Formula/oca-proxy.rb" (the formula from this repo is a good starting point)
+      # 3) Add a repo secret GH_PAT with "repo" scope (PAT) that has write access to the tap repo
+      #
+      # The action will:
+      # - Look at the current Release's tag (e.g., v1.2.3)
+      # - Update the version and download URLs in the tap formula (using the tag)
+      # - Compute new sha256 for each asset and commit the change to your tap
+      - name: Bump formula in Homebrew Tap
+        uses: mislav/bump-homebrew-formula-action@v2
+        with:
+          # Formula name without extension
+          formula-name: oca-proxy
+
+          # Your tap repository. This defaults to "<repo_owner>/homebrew-tap".
+          # If your tap name differs, change it accordingly.
+          tap: ${{ github.repository_owner }}/homebrew-tap
+
+          # Tag that triggered this workflow, e.g. "v1.0.4"
+          tag-name: ${{ github.event.release.tag_name }}
+
+          # Optional: if your formula is not at Formula/oca-proxy.rb inside the tap, set the path:
+          # formula-path: Formula/oca-proxy.rb
+        env:
+          # Personal Access Token with write access to the tap repo
+          GH_TOKEN: ${{ secrets.GH_PAT }}
