@@ -201,7 +201,81 @@ module.exports = {
   ],
 };
 ```
-
+ 
 Then start with `pm2 start ecosystem.config.js`.
+
+## Releases (GitHub Actions)
+
+Tagged pushes that match `v*.*.*` trigger a cross-platform build and GitHub Release with prebuilt binaries using `@yao-pkg/pkg`.
+
+- Workflow: `.github/workflows/release.yml`
+- Builds on: Ubuntu, macOS, Windows (Node 20)
+- Output release assets:
+ - `oca-proxy-macos-x64.tar.gz`
+ - `oca-proxy-macos-arm64.tar.gz`
+ - `oca-proxy-linux-x64.tar.gz`
+ - `oca-proxy-linux-arm64.tar.gz`
+ - `oca-proxy-windows-x64.zip`
+
+- How to test builds (Intel and Apple Silicon):
+  1. Manually run the workflow without tagging (GitHub → Actions → build-and-release → Run workflow).
+  2. Download artifacts for your platform from the run summary.
+  3. macOS:
+     - Intel: `chmod +x oca-proxy-macos-x64 && ./oca-proxy-macos-x64 --help`
+     - Apple Silicon: `chmod +x oca-proxy-macos-arm64 && ./oca-proxy-macos-arm64 --help`
+     - Test Intel binary on Apple Silicon via Rosetta: `arch -x86_64 ./oca-proxy-macos-x64 --help`
+  4. Linux:
+     - x64: `chmod +x oca-proxy-linux-x64 && ./oca-proxy-linux-x64 --help`
+     - arm64: `chmod +x oca-proxy-linux-arm64 && ./oca-proxy-linux-arm64 --help`
+  5. Windows:
+     - `.\oca-proxy-windows-x64.exe --help`
+  6. Optional smoke test: start the server and hit the health endpoint:
+     - `./oca-proxy-<platform-arch> &`
+     - `curl -s http://localhost:8669/health`
+
+Cut a release:
+
+```bash
+# 1) Bump your version in package.json (optional but recommended)
+# 2) Commit and tag
+git commit -am "chore: release v1.0.5"
+git tag v1.0.5
+git push origin v1.0.5
+```
+
+Or using npm to manage the version and tag:
+
+```bash
+npm version patch   # or minor/major
+git push --follow-tags
+```
+
+## Homebrew Tap
+
+You can distribute `oca-proxy` via a personal Homebrew tap.
+
+1. Create a tap repo: `your-user/homebrew-tap`
+2. Add a formula at `Formula/oca-proxy.rb` (a template exists in this repo under `Formula/oca-proxy.rb`)
+3. After a release publishes, update the `sha256` values in the formula for each asset:
+  - `shasum -a 256 oca-proxy-macos-x64.tar.gz`
+  - `shasum -a 256 oca-proxy-linux-x64.tar.gz`
+  - `shasum -a 256 oca-proxy-macos-arm64.tar.gz` (if you publish it)
+4. Commit the formula to your tap
+
+Install from your tap:
+
+```bash
+brew tap your-user/tap
+brew install oca-proxy
+```
+
+### Automate tap updates
+
+This repo includes `.github/workflows/brew-tap.yml` which can automatically bump your tap’s formula on every GitHub Release. Requirements:
+
+- Create `GH_PAT` secret (Personal Access Token with `repo` scope) in this repo
+- Ensure your tap repo is `your-user/homebrew-tap` (or adjust the workflow’s `tap:` input)
+
+The action computes new checksums and updates URLs in `Formula/oca-proxy.rb` within your tap repository.
 
 
