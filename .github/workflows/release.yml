@@ -17,8 +17,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        node: [20.x]
+        os: [ubuntu-latest, macos-latest]
+        node: [24.x]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -49,10 +49,10 @@ jobs:
           TARGETS="host"
           if [ "${{ runner.os }}" = "macOS" ]; then
             # Build both Intel and Apple Silicon binaries on macOS
-            TARGETS="node20-macos-x64,node20-macos-arm64"
+            TARGETS="node24-macos-x64,node24-macos-arm64"
           elif [ "${{ runner.os }}" = "Linux" ]; then
             # Build both x64 and arm64 binaries on Linux
-            TARGETS="node20-linux-x64,node20-linux-arm64"
+            TARGETS="node24-linux-x64,node24-linux-arm64"
           fi
           npx @yao-pkg/pkg . --targets "$TARGETS" --out-path dist/pkg
 
@@ -125,14 +125,6 @@ jobs:
           path: upload/oca-proxy-linux-arm64
           if-no-files-found: error
 
-      - name: Upload Windows (x64)
-        if: runner.os == 'Windows' && hashFiles('upload/oca-proxy-windows-x64.exe') != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: oca-proxy-windows-x64
-          path: upload/oca-proxy-windows-x64.exe
-          if-no-files-found: error
-
   release:
     name: Create GitHub Release with artifacts
     needs: build
@@ -144,25 +136,17 @@ jobs:
         with:
           path: ./artifacts
 
-      - name: Package assets (tar.gz on Unix, zip on Windows)
+      - name: Package assets (tar.gz)
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p upload
           for d in artifacts/*; do
             base="$(basename "$d")"
-            # Detect platform/arch from artifact name
-            if echo "$base" | grep -iq windows; then
-              # Windows: artifact is a single .exe file
-              exe_path="$(find "$d" -maxdepth 1 -type f -name '*.exe' | head -n1)"
-              out="upload/${base}.zip"
-              (cd "$(dirname "$exe_path")" && zip -9 "$(pwd)/../../${out}" "$(basename "$exe_path")")
-            else
-              # Unix: single binary file
-              bin_path="$(find "$d" -maxdepth 1 -type f -perm -u=x -or -name 'oca-proxy-*' | head -n1)"
-              out="upload/${base}.tar.gz"
-              (cd "$(dirname "$bin_path")" && tar -czf "$(pwd)/../../${out}" "$(basename "$bin_path")")
-            fi
+            # Single binary per artifact directory: package as tar.gz
+            bin_path="$(find "$d" -maxdepth 1 -type f -perm -u=x -or -name 'oca-proxy-*' | head -n1)"
+            out="upload/${base}.tar.gz"
+            (cd "$(dirname "$bin_path")" && tar -czf "$(pwd)/../../${out}" "$(basename "$bin_path")")
           done
           ls -l upload
 

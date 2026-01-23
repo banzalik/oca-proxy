@@ -4,6 +4,8 @@ OpenAI-compatible proxy server for Oracle Code Assist (OCA).
 
 This proxy handles OCI authentication via web-based OAuth flow and exposes standard OpenAI API endpoints, allowing any OpenAI-compatible tool to use OCA backend models.
 
+Note: Requires Node.js 24 LTS (>=24.0.0 <25).
+
 ## Quick Start
 
 ```bash
@@ -209,13 +211,13 @@ Then start with `pm2 start ecosystem.config.js`.
 Tagged pushes that match `v*.*.*` trigger a cross-platform build and GitHub Release with prebuilt binaries using `@yao-pkg/pkg`.
 
 - Workflow: `.github/workflows/release.yml`
-- Builds on: Ubuntu, macOS, Windows (Node 20)
+- Builds on: Ubuntu, macOS (Node 20)
 - Output release assets:
  - `oca-proxy-macos-x64.tar.gz`
  - `oca-proxy-macos-arm64.tar.gz`
  - `oca-proxy-linux-x64.tar.gz`
  - `oca-proxy-linux-arm64.tar.gz`
- - `oca-proxy-windows-x64.zip`
+
 
 - How to test builds (Intel and Apple Silicon):
   1. Manually run the workflow without tagging (GitHub → Actions → build-and-release → Run workflow).
@@ -227,9 +229,8 @@ Tagged pushes that match `v*.*.*` trigger a cross-platform build and GitHub Rele
   4. Linux:
      - x64: `chmod +x oca-proxy-linux-x64 && ./oca-proxy-linux-x64 --help`
      - arm64: `chmod +x oca-proxy-linux-arm64 && ./oca-proxy-linux-arm64 --help`
-  5. Windows:
-     - `.\oca-proxy-windows-x64.exe --help`
-  6. Optional smoke test: start the server and hit the health endpoint:
+
+  5. Optional smoke test: start the server and hit the health endpoint:
      - `./oca-proxy-<platform-arch> &`
      - `curl -s http://localhost:8669/health`
 

@@ -8,8 +8,8 @@
  *   bin/oca-proxy.js (executable on POSIX)
  */
 
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 const esbuild = require("esbuild");
 
 const ROOT = path.resolve(__dirname, "..");
@@ -55,13 +55,13 @@ async function build() {
 
 		// Print summary
 		console.log(`Built: ${path.relative(ROOT, OUT_FILE)}`);
-		if (result && result.metafile) {
+		if (result?.metafile) {
 			const outputs = Object.keys(result.metafile.outputs || {});
 			console.log(`Outputs: ${outputs.length}`);
 		}
 	} catch (err) {
 		console.error("esbuild failed:");
-		if (err && err.errors) {
+		if (err?.errors) {
 			for (const e of err.errors) {
 				console.error("-", e.text || e);
 			}
