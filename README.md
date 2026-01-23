@@ -15,7 +15,22 @@ Or install globally from npm and run:
 
 ```bash
 npm install -g oca-proxy
-oca-proxy
+# oca-proxy
+
+## Git hooks
+
+This repo uses Husky to run checks locally to keep the codebase consistent and healthy.
+
+- Pre-commit: runs Biome autofix (`npm run check`), re-stages changes, then runs `npm run lint` to ensure no remaining issues.
+- Pre-push: runs `npm run typecheck` and `npm run build` to catch type errors and build failures before pushing.
+
+Setup:
+- Hooks are installed automatically via the `prepare` script when you run `npm install`.
+- If hooks are missing, run: `npx husky install`.
+
+Skip hooks temporarily (use sparingly):
+- Commit without hooks: `git commit -m "msg" --no-verify`
+- Push without hooks: `git push --no-verify`
 ```
 
 ### From Source
