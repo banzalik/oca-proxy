@@ -144,9 +144,9 @@ jobs:
           for d in artifacts/*; do
             base="$(basename "$d")"
             # Single binary per artifact directory: package as tar.gz
-            bin_path="$(find "$d" -maxdepth 1 -type f -perm -u=x -or -name 'oca-proxy-*' | head -n1)"
-            out="upload/${base}.tar.gz"
-            (cd "$(dirname "$bin_path")" && tar -czf "$(pwd)/../../${out}" "$(basename "$bin_path")")
+            bin_path="$(find "$d" -maxdepth 1 -type f \( -perm -u=x -o -name 'oca-proxy-*' \) | head -n1)"
+            out_abs="$(pwd)/upload/${base}.tar.gz"
+            tar -C "$(dirname "$bin_path")" -czf "$out_abs" "$(basename "$bin_path")"
           done
           ls -l upload
 
