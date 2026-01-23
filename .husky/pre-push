@@ -1,0 +1,11 @@
+echo "Husky: Running Biome autofix (format + lint)..."
+npm run -s check
+git add -A
+
+echo "Husky: Running TypeScript typecheck..."
+npm run -s typecheck
+
+echo "Husky: Building project to validate production bundle..."
+npm run -s build
+
+echo "Husky: pre-push checks passed."

@@ -1,0 +1,9 @@
+echo "Husky: Running Biome autofix (format + lint)..."
+# Run Biome combined check with autofix (format + lint)
+npm run -s check
+
+# Re-stage any files modified by Biome so they're included in the commit
+git add -A
+
+# Ensure no remaining lint issues
+npm run -s lint
