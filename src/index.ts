@@ -1,6 +1,7 @@
 import axios from "axios";
 import express, { type Request, type Response } from "express";
 import { v4 as uuidv4 } from "uuid";
+import packageJson from "../package.json";
 import {
 	createAuthUrl,
 	createOcaHeaders,
@@ -19,6 +20,29 @@ import {
 } from "./config";
 import { registerDashboard } from "./dashboard";
 import { drawBox, keyValue, type LogEvent, log, logBus } from "./logger";
+
+const ARGV = process.argv.slice(2);
+
+if (ARGV.includes("--version") || ARGV.includes("-v")) {
+	console.log(`oca-proxy ${packageJson.version}`);
+	process.exit(0);
+}
+
+if (ARGV.includes("--help") || ARGV.includes("-h")) {
+	console.log(
+		[
+			"oca-proxy - OpenAI-compatible proxy for Oracle Code Assist",
+			"",
+			"Usage:",
+			"  oca-proxy [--help] [--version]",
+			"",
+			"Options:",
+			"  -h, --help     Show help",
+			"  -v, --version  Show version",
+		].join("\n"),
+	);
+	process.exit(0);
+}
 
 const app = express();
 app.use(express.json({ limit: "50mb" }));
@@ -216,6 +240,7 @@ app.get("/callback", async (req: Request, res: Response) => {
 		const e = err as { response?: { data?: unknown }; message?: string };
 		log.error(
 			`Token exchange failed: ${JSON.stringify(e.response?.data) || e.message}`,
+			e,
 		);
 		res.status(500).send(`
 			<html><body>
@@ -287,7 +312,7 @@ app.get("/api/models/full", async (_req: Request, res: Response) => {
 		res.json({ data: response.data.data || response.data || [] });
 	} catch (error: unknown) {
 		const e = error as { message?: string; response?: { status?: number } };
-		log.error(`Error listing full models: ${e.message}`);
+		log.error(`Error listing full models: ${e.message}`, e);
 		if (
 			e.message &&
 			(e.message.includes("Not authenticated") ||
@@ -340,9 +365,15 @@ app.post("/api/config", (req: Request, res: Response) => {
 			res.status(500).json({ error: "Failed to save config" });
 		}
 	} catch (error: unknown) {
-		const e = error as { message?: string };
-		log.error(`Error saving config: ${e.message}`);
-		res.status(500).json({ error: e.message || "Unknown error" });
+		const e = error as { message?: string; response?: { status?: number } };
+		log.error(`Error listing models: ${e.message}`, e);
+		if (e.message?.includes("Not authenticated")) {
+			res.status(401).json({ error: { message: e.message } });
+		} else {
+			res
+				.status(e.response?.status || 500)
+				.json({ error: { message: e.message || "Unknown error" } });
+		}
 	}
 });
 
@@ -374,7 +405,7 @@ app.get("/v1/models", async (_req: Request, res: Response) => {
 		res.json({ object: "list", data: models });
 	} catch (error: unknown) {
 		const e = error as { message?: string; response?: { status?: number } };
-		log.error(`Error listing models: ${e.message}`);
+		log.error(`Error listing models: ${e.message}`, e);
 		if (e.message?.includes("Not authenticated")) {
 			res.status(401).json({ error: { message: e.message } });
 		} else {
@@ -429,7 +460,7 @@ app.post("/v1/chat/completions", async (req: Request, res: Response) => {
 			response.data.pipe(res);
 
 			response.data.on("error", (err: Error) => {
-				log.error(`Stream error: ${err.message}`);
+				log.error(`Stream error: ${err.message}`, err);
 				res.end();
 			});
 		} else {
@@ -441,7 +472,7 @@ app.post("/v1/chat/completions", async (req: Request, res: Response) => {
 			code?: string;
 			response?: { status?: number; data?: unknown };
 		};
-		log.error(`Error in chat completions: ${e.message}`);
+		log.error(`Error in chat completions: ${e.message}`, e);
 		if (
 			e.message &&
 			(e.message.includes("Not authenticated") ||
@@ -536,7 +567,7 @@ app.post("/v1/responses", async (req: Request, res: Response) => {
 			response.data.pipe(res);
 
 			response.data.on("error", (err: Error) => {
-				log.error(`Stream error: ${err.message}`);
+				log.error(`Stream error: ${err.message}`, err);
 				res.end();
 			});
 		} else {
@@ -548,7 +579,7 @@ app.post("/v1/responses", async (req: Request, res: Response) => {
 			code?: string;
 			response?: { status?: number; data?: unknown };
 		};
-		log.error(`Error in responses: ${e.message}`);
+		log.error(`Error in responses: ${e.message}`, e);
 		if (
 			e.message &&
 			(e.message.includes("Not authenticated") ||
@@ -603,7 +634,7 @@ app.post("/v1/completions", async (req: Request, res: Response) => {
 		}
 	} catch (error: unknown) {
 		const e = error as { message?: string; response?: { status?: number } };
-		log.error(`Error in completions: ${e.message}`);
+		log.error(`Error in completions: ${e.message}`, e);
 		res
 			.status(e.response?.status || 500)
 			.json({ error: { message: e.message || "Unknown error" } });
@@ -626,7 +657,7 @@ app.post("/v1/embeddings", async (req: Request, res: Response) => {
 		res.json(response.data);
 	} catch (error: unknown) {
 		const e = error as { message?: string; response?: { status?: number } };
-		log.error(`Error in embeddings: ${e.message}`);
+		log.error(`Error in embeddings: ${e.message}`, e);
 		res
 			.status(e.response?.status || 500)
 			.json({ error: { message: e.message || "Unknown error" } });
@@ -1050,7 +1081,7 @@ app.post("/v1/messages", async (req: Request, res: Response) => {
 		}
 	} catch (error: unknown) {
 		const e = error as { message?: string; response?: { status?: number } };
-		log.anthropic(`Error: ${e.message}`);
+		log.error(`Error listing full models: ${e.message}`, e);
 		if (
 			e.message &&
 			(e.message.includes("Not authenticated") ||
@@ -1058,14 +1089,13 @@ app.post("/v1/messages", async (req: Request, res: Response) => {
 		) {
 			res.status(401).json({
 				error: {
-					type: "authentication_error",
-					message: `🔐 OCA Proxy Authentication Required\n\nPlease visit http://localhost:${PROXY_PORT}/login in your browser to authenticate with Oracle Code Assist.\n\nAfter logging in, retry your request.`,
+					message: `🔐 Authentication Required\n\nPlease visit http://localhost:${PROXY_PORT}/login to authenticate.`,
 				},
 			});
 		} else {
-			res.status(e.response?.status || 500).json({
-				error: { type: "api_error", message: e.message || "Unknown error" },
-			});
+			res
+				.status(e.response?.status || 500)
+				.json({ error: { message: e.message || "Unknown error" } });
 		}
 	}
 });

@@ -328,10 +328,6 @@ export function registerDashboard(
                           <div class="detail-label">Max Output</div>
                           <div class="detail-value">\${maxOutput}</div>
                         </div>
-                        <div class="detail">
-                          <div class="detail-label">Version</div>
-                          <div class="detail-value">\${info.version || 'N/A'}</div>
-                        </div>
                         \${info.reasoning_effort_options && info.reasoning_effort_options.length > 0 ? \`
                         <div class="detail">
                           <div class="detail-label">Reasoning Efforts</div>

@@ -124,15 +124,24 @@ export const log = {
 			type: "log",
 		});
 	},
-	error: (msg: string) => {
+	error: (msg: string, extra?: unknown) => {
 		console.log(
 			`${colors.red}✗${colors.reset} ${colors.red}${msg}${colors.reset}`,
 		);
+		let extraStr: string | undefined;
+		if (extra !== undefined) {
+			extraStr =
+				typeof extra === "string" ? extra : JSON.stringify(extra, null, 2);
+			if (extraStr) {
+				console.log(`${colors.dim}${extraStr}${colors.reset}`);
+			}
+		}
 		writeEvent({
 			ts: new Date().toISOString(),
 			level: "error",
 			message: msg,
 			type: "log",
+			extra: extraStr,
 		});
 	},
 	debug: (msg: string) => {
