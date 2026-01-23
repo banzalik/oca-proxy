@@ -1070,6 +1070,10 @@ app.post("/v1/messages", async (req: Request, res: Response) => {
 	}
 });
 
+app.post("/api/event_logging/batch", (_req: Request, res: Response) => {
+	res.status(204).end();
+});
+
 // 404 logging catch-all
 app.use((req: Request, res: Response) => {
 	log.warn(`404 Not Found: ${req.method} ${req.originalUrl}`);
