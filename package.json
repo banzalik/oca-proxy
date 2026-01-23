@@ -1,6 +1,6 @@
 {
   "name": "oca-proxy",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "OpenAI-compatible proxy for Oracle Code Assist (OCA)",
   "main": "dist/index.js",
   "bin": {
