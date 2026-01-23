@@ -11,7 +11,7 @@
     "url": "git+https://github.com/banzalik/oca-proxy.git"
   },
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --target=es2022 --outfile=bin/oca-proxy.js --format=cjs --banner:js='#!/usr/bin/env node' --minify --legal-comments=none && chmod +x bin/oca-proxy.js",
+    "build": "node -e \"const esb=require('esbuild');const fs=require('fs');esb.build({entryPoints:['src/index.ts'],bundle:true,platform:'node',target:'es2022',format:'cjs',outfile:'bin/oca-proxy.js',banner:{js:'#!/usr/bin/env node'},legalComments:'none',minify:true}).then(()=>{if(process.platform!=='win32'){fs.chmodSync('bin/oca-proxy.js',0o755)}}).catch((e)=>{console.error(e);process.exit(1)});\"",
     "start": "bin/oca-proxy.js",
     "dev": "tsx src/index.ts",
     "format": "biome format --write .",
